@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\QuestionResource;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class QuestionController extends Controller
 {
@@ -14,7 +16,8 @@ class QuestionController extends Controller
      */
     public function index()
     {
-        //
+
+        return QuestionResource::collection(Question::latest()->get());
     }
 
     /**
@@ -30,29 +33,31 @@ class QuestionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
+//        auth()->user()->question()->create($request->all());
+        Question::create($request->all());
+        return response('Created', Response::HTTP_CREATED);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Question  $question
+     * @param  \App\Models\Question $question
      * @return \Illuminate\Http\Response
      */
     public function show(Question $question)
     {
-        //
+        return new QuestionResource($question);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Question  $question
+     * @param  \App\Models\Question $question
      * @return \Illuminate\Http\Response
      */
     public function edit(Question $question)
@@ -63,8 +68,8 @@ class QuestionController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Question  $question
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Models\Question $question
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Question $question)
@@ -75,11 +80,15 @@ class QuestionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Question  $question
+     * @param  \App\Models\Question $question
      * @return \Illuminate\Http\Response
      */
     public function destroy(Question $question)
     {
-        //
+        try {
+            $question->delete();
+        } catch (\Exception $e) {
+        }
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
